@@ -1,5 +1,6 @@
 package com.badoo.automation.deviceserver.ios.simulator.data
 
+import com.badoo.automation.deviceserver.data.FilesDto
 import com.badoo.automation.deviceserver.data.UDID
 import com.badoo.automation.deviceserver.host.IRemote
 import com.badoo.automation.deviceserver.util.withDefers
@@ -28,22 +29,27 @@ class Media(
         restartAssetsd()
     }
 
-    fun addMedia(file: File, data: ByteArray) {
-        withDefers(logger) {
-            val tmpFile = File.createTempFile(file.nameWithoutExtension, ".${file.extension}")
-            defer { tmpFile.delete() }
-            tmpFile.writeBytes(data)
+    fun addMedia(data: FilesDto) {
+        var mediaPaths: List<String> = ArrayList()
 
-            val mediaPath: String = if (remote.isLocalhost()) {
-                tmpFile.absolutePath
+        withDefers(logger) {
+            data.files.forEach {
+                val file = File(it.file_name)
+                val tmpFile = File.createTempFile(file.nameWithoutExtension, ".${file.extension}")
+                defer { tmpFile.delete() }
+                tmpFile.writeBytes(it.data)
+                mediaPaths += tmpFile.absolutePath
+            }
+            val command: String = if (remote.isLocalhost()) {
+                mediaPaths.joinToString(separator = " ")
             } else {
                 val remoteMediaDir = remote.execIgnoringErrors(listOf("mktemp", "-d")).stdOut.trim()
                 defer { remote.execIgnoringErrors(listOf("rm", "-rf", remoteMediaDir)) }
-                remote.rsync(tmpFile.absolutePath, remoteMediaDir, setOf("-r", "--delete"))
-                File(remoteMediaDir, tmpFile.name).absolutePath
+                mediaPaths.forEach() { remote.rsync(File(it).absolutePath, remoteMediaDir, setOf("-r", "--delete")) }
+                mediaPaths.joinToString(separator = " ") { File(remoteMediaDir).absolutePath + File.separator + it }
             }
 
-            val result = remote.execIgnoringErrors(listOf("xcrun", "simctl", "addmedia", udid, mediaPath))
+            val result = remote.execIgnoringErrors(listOf("xcrun", "simctl", "addmedia", udid, command))
 
             if (!result.isSuccess) {
                 throw RuntimeException("Could not add Media to device: $result")

@@ -239,8 +239,8 @@ fun Application.module() {
                     }
                     post {
                         val ref = param(call, "ref")
-                        val dataPath = jsonContent<FileDto>(call)
-                        call.respond(devicesController.addMedia(ref, dataPath.file_name, dataPath.data))
+                        val data = jsonContent<FilesDto>(call)
+                        call.respond(devicesController.addMedia(ref, data))
                     }
                 }
                 route("diagnose/{type}") {

@@ -107,8 +107,8 @@ class DevicesController(private val deviceManager: DeviceManager) {
         return happy
     }
 
-    fun addMedia(ref: DeviceRef, fileName: String, data: ByteArray): EmptyMap {
-        deviceManager.addMedia(ref, fileName, data)
+    fun addMedia(ref: DeviceRef, data: FilesDto): EmptyMap {
+        deviceManager.addMedia(ref, data)
         return happy
     }
 

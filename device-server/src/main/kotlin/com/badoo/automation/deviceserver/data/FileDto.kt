@@ -9,3 +9,8 @@ data class FileDto(
     @JsonProperty("data")
     val data: ByteArray
 )
+
+data class FilesDto(
+    @JsonProperty("files")
+    val files: List<FileDto>
+)
