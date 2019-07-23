@@ -27,7 +27,7 @@ interface ISimulatorsNode {
     fun listFiles(deviceRef: DeviceRef, dataPath: DataPath): List<String>
     fun pullFile(deviceRef: DeviceRef, dataPath: DataPath): ByteArray
 
-    fun addMedia(deviceRef: DeviceRef, data: FilesDto)
+    fun addMedia(deviceRef: DeviceRef, data: MediaDTO)
     fun resetMedia(deviceRef: DeviceRef)
 
     fun getDiagnostic(deviceRef: DeviceRef, type: DiagnosticType, query: DiagnosticQuery): Diagnostic

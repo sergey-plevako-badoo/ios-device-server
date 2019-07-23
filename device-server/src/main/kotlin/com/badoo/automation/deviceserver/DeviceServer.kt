@@ -239,7 +239,7 @@ fun Application.module() {
                     }
                     post {
                         val ref = param(call, "ref")
-                        val data = jsonContent<FilesDto>(call)
+                        val data = jsonContent<MediaDTO>(call)
                         call.respond(devicesController.addMedia(ref, data))
                     }
                 }

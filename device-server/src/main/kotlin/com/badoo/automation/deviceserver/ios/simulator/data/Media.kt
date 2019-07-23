@@ -1,12 +1,16 @@
 package com.badoo.automation.deviceserver.ios.simulator.data
 
 import com.badoo.automation.deviceserver.data.FilesDto
+import com.badoo.automation.deviceserver.data.MediaDTO
 import com.badoo.automation.deviceserver.data.UDID
 import com.badoo.automation.deviceserver.host.IRemote
 import com.badoo.automation.deviceserver.util.withDefers
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Paths
+import java.nio.file.Files
+
+
 
 class Media(
     private val remote: IRemote,
@@ -29,16 +33,17 @@ class Media(
         restartAssetsd()
     }
 
-    fun addMedia(data: FilesDto) {
-        var mediaPaths: List<String> = ArrayList()
+    fun addMedia(data: MediaDTO) {
+        var mediaPath: String
+        val tempDir = Files.createTempDirectory(null)
 
         withDefers(logger) {
-            data.files.forEach {
-                val file = File(it.file_name)
-                val tmpFile = File.createTempFile(file.nameWithoutExtension, ".${file.extension}")
+            data.media?.forEach {
+                val file = File("${tempDir.toAbsolutePath()}${it.fileName}")
+                val tmpFile = file.createNewFile()
                 defer { tmpFile.delete() }
                 tmpFile.writeBytes(it.data)
-                mediaPaths += tmpFile.absolutePath
+                mediaPath = tempDir.listFiles()
             }
             val command: String = if (remote.isLocalhost()) {
                 mediaPaths.joinToString(separator = " ")

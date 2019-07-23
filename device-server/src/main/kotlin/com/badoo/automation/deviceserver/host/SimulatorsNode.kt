@@ -107,7 +107,7 @@ class SimulatorsNode(
         getDeviceFor(deviceRef).media.reset()
     }
 
-    override fun addMedia(deviceRef: DeviceRef, data: FilesDto) {
+    override fun addMedia(deviceRef: DeviceRef, data: MediaDTO) {
         getDeviceFor(deviceRef).media.addMedia(data)
     }
 
