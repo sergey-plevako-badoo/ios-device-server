@@ -447,8 +447,22 @@ class Simulator(
     private fun copyMediaAssets() {
         logger.debug(logMarker, "Copying assets to ${this@Simulator}")
         media.reset()
+
+        pollFor(
+            Duration.ofSeconds(5),
+            "PhotoData is empty",
+            logger = logger,
+            marker = logMarker
+        ) { media.listPhotoData().isEmpty() }
+
         File(assetsPath).walk().filter { it.isFile }.forEach {
            media.addMedia(it, it.readBytes())
+        }
+
+        val actualCount = media.listPhotoData().lines().size - 1
+        val expectedCount = media.list().lines().size - 1
+        if (actualCount != expectedCount) {
+            throw RuntimeException("The number of PhotoData is ${actualCount}, but should be ${expectedCount}")
         }
 
         logger.info(logMarker, "Copied assets to ${this@Simulator}")
